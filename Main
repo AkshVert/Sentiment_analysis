@@ -1,0 +1,70 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.model_selection import train_test_split
+from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+
+# Load the dataset
+df = pd.read_csv('/content/file[1].csv') # Replace with your dataset file name
+
+# View the first few rows of the dataset
+print(df.head())
+   Unnamed: 0                                             tweets   labels
+0           0  ChatGPT: Optimizing Language Models for Dialog...  neutral
+1           1  Try talking with ChatGPT, our new AI system wh...     good
+2           2  ChatGPT: Optimizing Language Models for Dialog...  neutral
+3           3  THRILLED to share that ChatGPT, our new model ...     good
+4           4  As of 2 minutes ago, @OpenAI released their ne...      bad
+
+# Get summary statistics of the numerical columns
+print(df.describe())
+        Unnamed: 0
+count  14047.000000
+mean    7023.000000
+std     4055.163951
+min        0.000000
+25%     3511.500000
+50%     7023.000000
+75%    10534.500000
+max    14046.000000
+
+# Check the data types and missing values
+print(df.info())
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 14047 entries, 0 to 14046
+Data columns (total 3 columns):
+ #   Column      Non-Null Count  Dtype 
+---  ------      --------------  ----- 
+ 0   Unnamed: 0  14047 non-null  int64 
+ 1   tweets      14047 non-null  object
+ 2   labels      14046 non-null  object
+dtypes: int64(1), object(2)
+memory usage: 329.4+ KB
+None
+
+# Remove duplicates (if any)
+df.drop_duplicates(inplace=True)
+
+# Lowercase the text
+df['tweets'] = df['tweets'].str.lower()
+df['labels'] = df['labels'].str.lower()
+
+# Remove special characters, URLs, and mentions
+df['tweets'] = df['tweets'].str.replace(r'http\S+|www\S+|@\w+', '', regex=True)
+df['labels'] = df['labels'].str.replace('[^a-zA-Z\s]', '')
+
+# Remove stopwords (optional)
+# from nltk.corpus import stopwords
+# stop_words = set(stopwords.words('english'))
+# df['text'] = df['text'].apply(lambda x: ' '.join([word for word in x.split() if word not in stop_words]))
+
+# Visualize the distribution of sentiments
+plt.figure(figsize=(8, 6))
+sns.countplot(x='labels', data=df, palette='coolwarm')
+plt.xlabel('labels')
+plt.ylabel('tweet')
+plt.title('Distribution of Sentiments')
+plt.show()
